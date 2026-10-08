@@ -4,9 +4,6 @@
 
 开箱即可注册 / 登录，按「基线 + 环境差异」组织配置，分层单向依赖，可直接作为新项目的起点。
 
-> 本仓库由早期版本 `Simple-Gin-Example` 重构而来，架构与约定对齐参考模板 `golang-web-template`；
-> 在其基础上额外保留了 `internal/pkg/httpclient`（出站 HTTP 客户端）。
-
 > **全部接口都是 RESTful**。列表 / 分页查询由 `GET /api/v1/orgs` 示范完整链路
 > （`query.Page` → `repository.Page` → `dto.NewPageResult` → `response.Page`），新业务照抄即可。
 
