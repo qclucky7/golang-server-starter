@@ -3,7 +3,8 @@ package repository
 import (
 	"context"
 
-	"gin-quick-start/internal/model"
+	"golang-server-starter/internal/model"
+	"golang-server-starter/internal/pkg/query"
 
 	"gorm.io/gorm"
 )
@@ -30,4 +31,12 @@ func (r *OrgRepository) FindDefaultByOwner(ctx context.Context, ownerID model.ID
 // ListByOwner 查询账号拥有的全部组织
 func (r *OrgRepository) ListByOwner(ctx context.Context, ownerID model.ID) ([]model.Org, error) {
 	return r.List(ctx, WhereEq("owner_id", ownerID))
+}
+
+// PageByOwner 分页查询账号拥有的组织，返回列表与总条数。
+//
+// 分页参数归一化（越界回落默认值）与 order_by 白名单校验都由
+// 泛型仓储的 Page 完成，这里只负责追加 owner_id 过滤条件。
+func (r *OrgRepository) PageByOwner(ctx context.Context, ownerID model.ID, page *query.Page) ([]model.Org, int64, error) {
+	return r.Page(ctx, page, WhereEq("owner_id", ownerID))
 }

@@ -5,12 +5,12 @@ import (
 	"errors"
 	"strings"
 
-	"gin-quick-start/internal/apperr"
-	"gin-quick-start/internal/dto"
-	"gin-quick-start/internal/model"
-	"gin-quick-start/internal/pkg/hash"
-	"gin-quick-start/internal/pkg/token"
-	"gin-quick-start/internal/repository"
+	"golang-server-starter/internal/apperr"
+	"golang-server-starter/internal/dto"
+	"golang-server-starter/internal/model"
+	"golang-server-starter/internal/pkg/hash"
+	"golang-server-starter/internal/pkg/token"
+	"golang-server-starter/internal/repository"
 
 	"gorm.io/gorm"
 )

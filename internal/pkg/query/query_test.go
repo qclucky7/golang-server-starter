@@ -3,7 +3,7 @@ package query_test
 import (
 	"testing"
 
-	"gin-quick-start/internal/pkg/query"
+	"golang-server-starter/internal/pkg/query"
 )
 
 func TestPageNormalize(t *testing.T) {

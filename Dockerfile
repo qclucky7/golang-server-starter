@@ -42,7 +42,7 @@ ENV APP_ENV=prod \
 #     -e APP_JWT_SECRET=xxxx \
 #     -e APP_DATABASE_DSN='app:xxx@tcp(mysql:3306)/demo?charset=utf8mb4&parseTime=True&loc=Local' \
 #     -e APP_NODE_ID=1 \
-#     -v $PWD/logs:/app/logs gin-quick-start:latest
+#     -v $PWD/logs:/app/logs golang-server-starter:latest
 
 EXPOSE 8080
 

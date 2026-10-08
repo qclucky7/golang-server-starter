@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	"gin-quick-start/internal/model"
-	"gin-quick-start/internal/pkg/query"
-	"gin-quick-start/internal/pkg/snowflake"
-	"gin-quick-start/internal/repository"
+	"golang-server-starter/internal/model"
+	"golang-server-starter/internal/pkg/query"
+	"golang-server-starter/internal/pkg/snowflake"
+	"golang-server-starter/internal/repository"
 
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"

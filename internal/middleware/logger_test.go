@@ -9,7 +9,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"gin-quick-start/internal/apperr"
+	"golang-server-starter/internal/apperr"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"

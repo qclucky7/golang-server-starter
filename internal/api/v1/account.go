@@ -1,13 +1,13 @@
 package v1
 
 import (
-	"gin-quick-start/internal/dto"
-	"gin-quick-start/internal/middleware"
-	"gin-quick-start/internal/pkg/contextx"
-	"gin-quick-start/internal/pkg/request"
-	"gin-quick-start/internal/pkg/response"
-	"gin-quick-start/internal/repository"
-	"gin-quick-start/internal/service"
+	"golang-server-starter/internal/dto"
+	"golang-server-starter/internal/middleware"
+	"golang-server-starter/internal/pkg/contextx"
+	"golang-server-starter/internal/pkg/request"
+	"golang-server-starter/internal/pkg/response"
+	"golang-server-starter/internal/repository"
+	"golang-server-starter/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

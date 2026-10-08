@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gin-quick-start/internal/config"
+	"golang-server-starter/internal/config"
 
 	"github.com/gin-gonic/gin"
 )

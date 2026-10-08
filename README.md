@@ -1,14 +1,14 @@
-# gin-quick-start
+# golang-server-starter
 
-基于 **Gin + GORM** 的 Go 服务端模板：统一响应体、统一错误处理、JWT 鉴权、泛型 CRUD 仓储、雪花主键、多环境配置、Swagger 文档、GraphQL 只读查询层。
+基于 **Gin + GORM** 的 Go 服务端模板：统一响应体、统一错误处理、JWT 鉴权、泛型 CRUD 仓储、雪花主键、多环境配置、分页查询、Swagger 文档。**纯 REST，不引入 GraphQL。**
 
 开箱即可注册 / 登录，按「基线 + 环境差异」组织配置，分层单向依赖，可直接作为新项目的起点。
 
 > 本仓库由早期版本 `Simple-Gin-Example` 重构而来，架构与约定对齐参考模板 `golang-web-template`；
 > 在其基础上额外保留了 `internal/pkg/httpclient`（出站 HTTP 客户端）。
 
-> **REST 与 GraphQL 并行**：REST 负责全部命令操作（注册 / 登录 / 刷新 / 登出 / 改密）与探针；
-> GraphQL 只提供 Query（`health` / `me`），不提供 Mutation。详见 [GraphQL 查询层](#graphql-查询层)。
+> **全部接口都是 RESTful**。列表 / 分页查询由 `GET /api/v1/orgs` 示范完整链路
+> （`query.Page` → `repository.Page` → `dto.NewPageResult` → `response.Page`），新业务照抄即可。
 
 ---
 
@@ -25,7 +25,7 @@ go run ./cmd/server -e dev   # 本地启动，sqlite，零依赖不用起数据�
 |---|---|---|
 | 基线 | MySQL | `configs/config.yaml`，test / prod 共用 |
 | `dev` | sqlite | `configs/config-dev.yaml` → `data/app.db` |
-| `test` | MySQL | `configs/config-test.yaml`，独立库名 `gin_quick_start_test` |
+| `test` | MySQL | `configs/config-test.yaml`，独立库名 `golang_server_starter_test` |
 | `prod` | MySQL | `configs/config-prod.yaml`，不写 driver 即继承基线 |
 
 PostgreSQL 同样支持（改 `database.driver` 即可），只是不作默认。启动日志会打印实际加载的配置文件：
@@ -39,11 +39,6 @@ env=dev configs=[configs/config.yaml configs/config-dev.yaml] node_id=837
 | `http://127.0.0.1:8080/healthz` | 存活探针 |
 | `http://127.0.0.1:8080/api/v1/system/health-check` | 健康检查 |
 | `http://127.0.0.1:8080/swagger/index.html` | Swagger UI |
-| `http://127.0.0.1:8080/graphql` | **GraphQL 查询端点**（POST），浏览器打开则进 GraphiQL 调试页 |
-
-> 打开 `http://127.0.0.1:8080/graphql` 会**自动预填一个可跑的示例查询**，直接点运行即可。
-> 示例同时取 `health` 与 `me` 两个资源 —— REST 下这要打两个接口。
-> GraphiQL 仅在 `dev` 环境开启（`graphql.playground`）。
 
 ### 冒烟测试
 
@@ -63,16 +58,9 @@ curl http://127.0.0.1:8080/api/v1/auth/profile \
   -H "Authorization: Bearer <access_token>"
 # 返回当前账号 + 默认组织；ID 是字符串（雪花 19 位）
 
-# GraphQL：匿名查询
-curl -X POST http://127.0.0.1:8080/graphql \
-  -H "Content-Type: application/json" \
-  -d '{"query":"{ health { name version env } }"}'
-
-# GraphQL：一次取回账号与组织（等价于 REST 的 /auth/profile）
-curl -X POST http://127.0.0.1:8080/graphql \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <access_token>" \
-  -d '{"query":"{ me { account { id username } org { name isDefault } } }"}'
+# 分页查询当前账号拥有的组织（响应形状 grid.result）
+curl "http://127.0.0.1:8080/api/v1/orgs?current=1&size=10" \
+  -H "Authorization: Bearer <access_token>"
 ```
 
 ---
@@ -84,8 +72,6 @@ curl -X POST http://127.0.0.1:8080/graphql \
 ├── cmd/server/main.go        # 入口：解析参数 → 装配 → 启动 → 优雅退出
 ├── configs/                  # 基线 + 环境差异（config-dev / -test / -prod.yaml）
 ├── docs/                     # swag init 生成的接口文档
-├── gqlgen.yml                # GraphQL 代码生成配置（schema 路径 / 输出位置 / 标量映射）
-├── tools.go                  # 把 gqlgen 等命令行工具锚在 go.mod 里（build tag 排除编译）
 ├── internal/
 │   ├── api/                  # HTTP 装配
 │   │   ├── router.go         #   引擎构建 + 404/405 兜底
@@ -93,8 +79,8 @@ curl -X POST http://127.0.0.1:8080/graphql \
 │   │   └── v1/               #   v1 模块体系
 │   │       ├── module.go     #     模块契约 + 模块清单（新增业务域改这里）
 │   │       ├── routes.go     #     遍历清单挂载路由（不含具体接口知识）
-│   │       ├── account.go    #     账号域：装配 + 路由 + 处理器（REST）
-│   │       ├── graphql.go    #     GraphQL 端点（传输层模块，可按配置关闭）
+│   │       ├── account.go    #     账号域：装配 + 路由 + 处理器
+│   │       ├── org.go        #     组织域：分页查询示例（装配 + 路由 + 处理器）
 │   │       └── system.go     #     系统域：装配 + 路由 + 处理器
 │   ├── apperr/               # 统一错误类型与错误码
 │   ├── bootstrap/            # 基础设施装配（Container）与 HTTP 生命周期（Server）
@@ -102,17 +88,6 @@ curl -X POST http://127.0.0.1:8080/graphql \
 │   ├── constant/             # 请求头、默认值等常量
 │   ├── database/             # GORM 连接、连接池、自动迁移
 │   ├── dto/                  # 请求/响应结构，与实体解耦
-│   ├── graphql/              # GraphQL 查询层
-│   │   ├── schema.graphqls   #   schema（唯一契约，改完跑 make gqlgen）
-│   │   ├── generated.go      #   生成：执行引擎
-│   │   ├── schema.resolvers.go # 生成：解析器方法（实现写在里面，重新生成会保留）
-│   │   ├── resolver.go       #   手写：根解析器（持有 service）
-│   │   ├── convert.go        #   手写：实体 → GraphQL 投影（白名单）
-│   │   ├── error.go          #   手写：错误映射（apperr → GraphQL error）
-│   │   ├── auth.go           #   手写：当前账号取值
-│   │   ├── model/            #   生成：GraphQL 类型
-│   │   ├── scalar/           #   手写：自定义标量（Time）
-│   │   └── gqlctx/           #   手写：HTTP 请求信息搬进 resolver context
 │   ├── middleware/           # request_id / locale / error_handler / cors / logger / ratelimit / auth
 │   ├── model/                # 数据库实体 + 公共数据结构
 │   ├── repository/           # 数据访问层（泛型 CRUD 基类 + 表专属方法）
@@ -267,108 +242,55 @@ id      := contextx.AccountID(c)   // model.ID
 | POST | `/api/v1/auth/logout` | ✅ | 登出（吊销全部令牌） |
 | GET | `/api/v1/auth/profile` | ✅ | 当前账号信息 + 默认组织 |
 | PUT | `/api/v1/auth/password` | ✅ | 修改密码 |
-| POST | `/graphql` | 可选 | GraphQL 查询端点（字段级鉴权） |
-| GET | `/graphql` | - | GraphiQL 调试页（仅 `graphql.playground` 开启时） |
+| GET | `/api/v1/orgs` | ✅ | 分页查询当前账号拥有的组织 |
 
-REST 接口只有**认证**与**账号自服务**两类。全部受保护接口都只操作当前登录账号自己，路径里不带目标账号 ID。
+接口只有**认证**、**账号自服务**与**组织查询**三类。全部受保护接口都只操作当前登录账号自己，路径里不带目标账号 ID。
 
 所有接口都支持语言协商（`X-Lang` / `Accept-Language` / `?lang=`），详见[多语言](#多语言i18n)。
 
 > `internal/api/v1/routes_test.go` 断言了路由总数与路径前缀，接口面被无声扩大时会直接测试失败。
-> `internal/api/v1/graphql_test.go` 另外钉住了 GraphQL 端点的挂载规则、错误码与 200/422 的分界。
 
 ---
 
-## GraphQL 查询层
+## 分页查询
 
-与 REST **并行**存在，只提供 Query，不提供 Mutation。
+`GET /api/v1/orgs` 是模板里唯一的列表接口，作用是把分页链路完整串一遍，新业务照抄即可。
 
-| | REST | GraphQL |
+请求参数（`dto.OrgQuery` 内嵌 `query.Page`）：
+
+| 参数 | 默认 | 说明 |
 |---|---|---|
-| 承担 | 全部命令操作（注册 / 登录 / 刷新 / 登出 / 改密）+ 探针 | 只读查询（`health` / `me`） |
-| 响应体 | `{model, data, request_id}` 信封 | `{data, errors}`（GraphQL 规范形状，**不套信封**） |
-| 失败表现 | HTTP 状态码 + 信封里的错误码 | 业务错误 **HTTP 200** + `errors[].extensions.code` |
-| 文档 | Swagger UI（`make docs`） | GraphiQL 的 Docs 面板 + introspection |
+| `current` | 1 | 页码，从 1 开始；越界静默归一化 |
+| `size` | 10 | 每页条数，上限 200 |
+| `order_by` | `id` | 排序字段，按模型真实列白名单校验，非法值回落 `id` |
+| `order` | `desc` | `asc` / `desc` |
 
-### 为什么不做 Mutation
+响应形状是固定的 `grid.result` 契约：
 
-写操作需要事务边界、幂等与鉴权的一致语义，而 GraphQL 的业务错误一律返回 HTTP 200，
-失败只能从 `errors[]` 里看 —— 对登录这类需要明确状态码的场景是净损失。
-查询则相反：客户端能按需选字段、一次取多个资源，这才是 GraphQL 的价值所在。
-
-### 错误处理：200 与 422 的分界
-
-**并不是所有 GraphQL 错误都返回 200**，gqlgen 按错误类型分两档：
-
-| 类型 | 例子 | HTTP | `extensions.code` |
-|---|---|---|---|
-| 业务错误（`apperr.APIError`） | 未登录、账号或密码错误 | **200** | 与 REST 同一套错误码，如 `auth.token.missing` |
-| 协议错误（语法 / 校验） | 查询写错、字段不存在 | **422** | `GRAPHQL_PARSE_FAILED` / `GRAPHQL_VALIDATION_FAILED` |
-| 未预期错误（panic、原始 error） | 空指针、未包装的 DB 错误 | **200** | `common.internal.error`，细节只进日志 |
-
-所以客户端**不能只看状态码**：业务失败是 200，得看 `errors[].extensions.code`；
-而 422 说明查询本身写错了，是开发期问题，不是业务分支。
-
-错误映射集中在 `internal/graphql/error.go` 的 `ErrorPresenter` / `Recover`。
-之所以不用 gqlgen 默认的 `DefaultRecover`：它把原始错误打到 `os.Stderr` 并统一换成
-`internal system error`，业务错误码会整条丢掉。
-
-### 怎么加一个新查询
-
-项目里**没有列表 / 分页接口**可以照抄，下面是一个最小完整例子（加一个「按当前账号统计组织数」的查询）：
-
-1. **改 schema** `internal/graphql/schema.graphqls`：
-
-```graphql
-type Query {
-  health: Health!
-  me: AccountDetail!
-  # 新增
-  myOrgCount: Int!
+```json
+{
+  "model": "grid.result",
+  "page": { "model": "page", "current": 1, "size": 10, "total": 1, "total_page": 1 },
+  "result": {
+    "model": "data.set",
+    "datas": [ { "id": "1859123456789012481", "name": "demo的组织", "owner_id": "1859123456789012480", "is_default": true } ],
+    "total": 1
+  },
+  "request_id": "..."
 }
 ```
 
-2. **重新生成**：
+四个环节各司其职：
 
-```bash
-make gqlgen        # Windows: make.bat gqlgen
-```
+| 环节 | 用什么 |
+|---|---|
+| 请求参数 | `dto.OrgQuery`（内嵌 `query.Page`） |
+| 数据查询 | `repository.Repository[T].Page(ctx, &page, scopes...)` → `(items, total, err)` |
+| 分页信息 | `dto.NewPageResult(page, int(total))` |
+| 响应渲染 | `response.Page(c, convert.AnySlice(items), page)`；不分页则用 `response.List` |
 
-gqlgen 会在 `schema.resolvers.go` 里补一个 `panic("not implemented")` 的桩，
-**已有的解析器实现会原样保留**（它按方法名比对，不会覆盖）。
-
-3. **填实现**，并在 `internal/graphql/convert.go` 里做投影（如果返回的是实体）：
-
-```go
-func (r *queryResolver) MyOrgCount(ctx context.Context) (int, error) {
-	account, err := currentAccount(ctx) // 未登录返回 auth.token.missing
-	if err != nil {
-		return 0, err
-	}
-	return r.Accounts.CountOrgs(ctx, account.ID)
-}
-```
-
-4. **补测试**：`internal/api/v1/graphql_test.go` 里有现成的 `postGraphQL` 辅助函数，直接复用。
-
-要点：
-
-- **service 层不动**。GraphQL 只是多了一个入口，`service` / `repository` / `dto` 一行都不用改。
-- **别直接返回实体**。GraphQL 类型是独立投影（`internal/graphql/model`），
-  在 `convert.go` 里显式列字段 —— 这样数据库新增列不会自动对外暴露。
-- **鉴权在解析器里做**。端点用可选鉴权（否则公开查询也得带令牌），
-  需要登录的字段调 `currentAccount(ctx)`。
-- **改了 schema 必须重新生成**，否则编译期就会报类型不匹配 —— 这正是选 gqlgen 的理由。
-
-### 配置
-
-```yaml
-graphql:
-  enabled: true          # 关闭则一条路由都不挂
-  path: /graphql
-  playground: false      # 浏览器调试页，dev 环境打开
-  introspection: false   # 是否允许拉取完整 schema，dev 环境打开
-```
+> 参数归一化与 `order_by` 白名单校验都在仓储层的 `Page` 里完成，并**就地回写**入参 ——
+> handler 可以直接拿归一化后的 `page` 构造分页信息，不必自己再夹一次边界。
 
 生产建议两者都关：它们会把完整 schema 与数据形状暴露给任何人。
 
@@ -510,11 +432,6 @@ accounts                          orgs
 | 4 | `internal/service/order.go` | 业务逻辑，返回 `apperr.APIError` |
 | 5 | `internal/api/v1/order.go` | **新建模块文件**：装配 + 路由 + 处理器 |
 | 6 | `internal/api/v1/module.go` | 模块清单里**加一行** |
-
-> 如果这个模块也要提供 GraphQL 查询，**不要**新建 `newXxxGraphQLModule` ——
-> GraphQL 是单端点 + 全局 schema，加查询的做法是「改 schema + 在 `internal/graphql`
-> 里补解析器」，见 [怎么加一个新查询](#怎么加一个新查询)。
-> 上面这套流程加的是 **REST 模块**。
 
 第 5 步长这样 —— 装配、路由、处理器全在一个文件里，本域的东西一眼看全：
 
@@ -665,14 +582,8 @@ go run ./cmd/server -c configs/config.yaml -e prod   # 基线路径与环境正�
 | `log.sensitive_keys` | `[]` | 在内置脱敏名单外追加的字段名 / 头名 |
 | `rate_limit.rps` | `50` | 单 IP 每秒请求数 |
 | `cors.allow_origins` | `["*"]` | 允许来源；开启 `allow_credentials` 时自动回显 Origin |
-| `graphql.enabled` | `true` | 关闭后 `/graphql` 一条路由都不挂 |
-| `graphql.path` | `/graphql` | 端点路径，必须以 `/` 开头（启动校验） |
-| `graphql.playground` | `false` | 浏览器调试页（GraphiQL），dev 环境打开 |
-| `graphql.introspection` | `false` | 是否允许拉取完整 schema，dev 环境打开 |
 
 > 鉴权头不可配置，固定为 `Authorization`，故无 `auth.*` 配置项。
-> `graphql.playground` 与 `graphql.introspection` 默认**关闭** —— 需要时由 `config-dev.yaml` 打开，
-> 而不是默认放开再由生产去关。
 
 ```bash
 APP_SERVER_PORT=9090 APP_JWT_SECRET=your-long-random-secret go run ./cmd/server
@@ -715,17 +626,13 @@ make run ENV=test     # 指定环境启动
 make run ENV=prod     # 生产启动（需先注入 APP_JWT_SECRET / APP_DATABASE_DSN / APP_NODE_ID）
 make build            # 编译到 bin/
 make docs             # 生成 Swagger 文档
-make gqlgen           # 按 schema.graphqls 重新生成 GraphQL 代码（改完 schema 必跑）
 make fmt vet test     # 格式化 + 静态检查 + 测试
 make check            # 上面三件套
 make docker           # 构建镜像
 ```
 
 Windows 使用 `make.bat <target>`，环境用第二个参数：`make.bat run test`。
-
-> `make gqlgen` 依赖 `tools.go` 里对 `github.com/99designs/gqlgen` 的空白 import。
-> 别删它：`go mod tidy` 会把「没有任何包 import 的模块」及其 go.sum 条目剪掉，
-> 之后 `go run github.com/99designs/gqlgen generate` 会因为缺 go.sum 条目直接失败。
+交叉编译用 `make build-linux` / `make build-windows`（Windows 下同样支持 `make.bat build-linux`）。
 
 ---
 

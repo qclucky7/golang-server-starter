@@ -1,7 +1,7 @@
-# gin-quick-start 开发命令
+# golang-server-starter 开发命令
 # Windows 用户可直接使用 make.bat（命令与 target 同名）
 
-APP_NAME    := gin-quick-start
+APP_NAME    := golang-server-starter
 MAIN_PKG    := ./cmd/server
 BIN_DIR     := bin
 SWAG        := swag
@@ -33,10 +33,6 @@ build-windows: ## 交叉编译 Windows amd64
 .PHONY: docs
 docs: ## 生成 Swagger 文档到 docs/
 	$(SWAG) init -g cmd/server/main.go -o docs --parseInternal
-
-.PHONY: gqlgen
-gqlgen: ## 根据 internal/graphql/schema.graphqls 生成 GraphQL 代码
-	$(GO) run github.com/99designs/gqlgen generate
 
 .PHONY: fmt
 fmt: ## 格式化代码

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"gin-quick-start/internal/model"
+	"golang-server-starter/internal/model"
 )
 
 // TestIDMarshalsAsString 雪花 ID 必须序列化成 JSON 字符串。

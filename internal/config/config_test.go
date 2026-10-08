@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"gin-quick-start/internal/config"
+	"golang-server-starter/internal/config"
 )
 
 // baseConfig 一份能通过校验的最小基线配置

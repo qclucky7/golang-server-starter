@@ -7,7 +7,7 @@ import (
 	"sync"
 	"testing"
 
-	"gin-quick-start/internal/config"
+	"golang-server-starter/internal/config"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"

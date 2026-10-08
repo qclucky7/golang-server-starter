@@ -10,13 +10,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	_ "gin-quick-start/docs" // swag 生成的接口文档
-	"gin-quick-start/internal/bootstrap"
-	"gin-quick-start/internal/config"
-	"gin-quick-start/internal/pkg/logger"
+	_ "golang-server-starter/docs" // swag 生成的接口文档
+	"golang-server-starter/internal/bootstrap"
+	"golang-server-starter/internal/config"
+	"golang-server-starter/internal/pkg/logger"
 )
 
-// @title						Gin Quick Start API
+// @title						Golang Server Starter API
 // @version					1.0.0
 // @description				基于 Gin + GORM 的 Go 服务端模板：统一响应体、统一错误处理、JWT 鉴权、泛型 CRUD 仓储、Swagger 文档。
 // @description

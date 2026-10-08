@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"gin-quick-start/internal/model"
+	"golang-server-starter/internal/model"
 
 	"gorm.io/gorm"
 )

@@ -56,7 +56,6 @@ type Config struct {
 	Log       Log       `mapstructure:"log"`
 	RateLimit RateLimit `mapstructure:"rate_limit"`
 	CORS      CORS      `mapstructure:"cors"`
-	GraphQL   GraphQL   `mapstructure:"graphql"`
 
 	// LoadedFiles 实际加载成功的配置文件（按覆盖顺序），仅供启动日志展示。
 	LoadedFiles []string `mapstructure:"-"`
@@ -157,22 +156,6 @@ type RateLimit struct {
 	Enabled bool    `mapstructure:"enabled"`
 	RPS     float64 `mapstructure:"rps"`
 	Burst   int     `mapstructure:"burst"`
-}
-
-// GraphQL 只读查询层配置。
-//
-// GraphQL 与 REST 并存：REST 保留全部既有接口，GraphQL 只提供 Query。
-// 关闭 enabled 即完全不挂载端点，不留任何路由。
-type GraphQL struct {
-	// Enabled 是否挂载 GraphQL 端点
-	Enabled bool `mapstructure:"enabled"`
-	// Path 端点路径，必须以 / 开头
-	Path string `mapstructure:"path"`
-	// Playground 是否挂载浏览器调试 IDE。GET 同一路径即可打开，生产应关闭
-	Playground bool `mapstructure:"playground"`
-	// Introspection 是否允许 introspection 查询。
-	// 关闭后客户端无法拉取 schema，但自己写的查询照常执行；生产建议关闭
-	Introspection bool `mapstructure:"introspection"`
 }
 
 // CORS 跨域配置
@@ -336,14 +319,11 @@ func (c *Config) Validate() error {
 			return errors.New("i18n.header 与 i18n.alt_header 不能同时为空")
 		}
 	}
-	if c.GraphQL.Enabled && !strings.HasPrefix(strings.TrimSpace(c.GraphQL.Path), "/") {
-		return fmt.Errorf("graphql.path 必须以 / 开头，当前: %q", c.GraphQL.Path)
-	}
 	return nil
 }
 
 func setDefaults(v *viper.Viper) {
-	v.SetDefault("app.name", "gin-quick-start")
+	v.SetDefault("app.name", "golang-server-starter")
 	v.SetDefault("app.version", "1.0.0")
 	v.SetDefault("app.env", DefaultEnv)
 	v.SetDefault("app.node_id", -1)
@@ -359,14 +339,14 @@ func setDefaults(v *viper.Viper) {
 	// 默认数据库是 MySQL；postgres / sqlite 同样支持，改 database.driver 即可
 	// （本地开发用 sqlite，见 configs/config-dev.yaml）
 	v.SetDefault("database.driver", "mysql")
-	v.SetDefault("database.dsn", "root:123456@tcp(127.0.0.1:3306)/gin_quick_start?charset=utf8mb4&parseTime=True&loc=Local")
+	v.SetDefault("database.dsn", "root:123456@tcp(127.0.0.1:3306)/golang_server_starter?charset=utf8mb4&parseTime=True&loc=Local")
 	v.SetDefault("database.max_idle_conns", 10)
 	v.SetDefault("database.max_open_conns", 100)
 	v.SetDefault("database.conn_max_lifetime", "1h")
 	v.SetDefault("database.log_level", "warn")
 	v.SetDefault("database.auto_migrate", true)
 
-	v.SetDefault("jwt.issuer", "gin-quick-start")
+	v.SetDefault("jwt.issuer", "golang-server-starter")
 	v.SetDefault("jwt.access_ttl", "2h")
 	v.SetDefault("jwt.refresh_ttl", "168h")
 	// 没有默认值也必须登记：viper 的 Unmarshal 只遍历「已知键」（默认值 + 配置文件键），
@@ -402,11 +382,4 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("cors.expose_headers", []string{"X-Request-Id"})
 	v.SetDefault("cors.allow_credentials", false)
 	v.SetDefault("cors.max_age", "12h")
-
-	v.SetDefault("graphql.enabled", true)
-	v.SetDefault("graphql.path", "/graphql")
-	// Playground / introspection 默认关闭：它们把 schema 与数据形状暴露给任何人，
-	// 需要时由 config-dev.yaml 打开，而不是默认放开再由生产去关。
-	v.SetDefault("graphql.playground", false)
-	v.SetDefault("graphql.introspection", false)
 }

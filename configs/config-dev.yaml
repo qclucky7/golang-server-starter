@@ -16,11 +16,11 @@ database:
   # ── 想连真实数据库时换成下面之一 ────────────────────────────────────
   # MySQL（同基线）
   # driver: mysql
-  # dsn: root:123456@tcp(127.0.0.1:3306)/gin_quick_start?charset=utf8mb4&parseTime=True&loc=Local
+  # dsn: root:123456@tcp(127.0.0.1:3306)/golang_server_starter?charset=utf8mb4&parseTime=True&loc=Local
   #
   # PostgreSQL
   # driver: postgres
-  # dsn: host=127.0.0.1 user=postgres password=123456 dbname=gin_quick_start port=5432 sslmode=disable TimeZone=Asia/Shanghai
+  # dsn: host=127.0.0.1 user=postgres password=123456 dbname=golang_server_starter port=5432 sslmode=disable TimeZone=Asia/Shanghai
 
 log:
   level: debug
@@ -32,8 +32,3 @@ log:
 rate_limit:
   # 本地调试不限制
   enabled: false
-
-graphql:
-  # 开发环境打开调试 IDE（浏览器访问 GET /graphql）与 introspection
-  playground: true
-  introspection: true

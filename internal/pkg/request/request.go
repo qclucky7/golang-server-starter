@@ -15,9 +15,9 @@ import (
 	"regexp"
 	"strings"
 
-	"gin-quick-start/internal/apperr"
-	"gin-quick-start/internal/pkg/contextx"
-	"gin-quick-start/internal/pkg/i18n"
+	"golang-server-starter/internal/apperr"
+	"golang-server-starter/internal/pkg/contextx"
+	"golang-server-starter/internal/pkg/i18n"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"

@@ -16,7 +16,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 app:
-  name: gin-quick-start
+  name: golang-server-starter
   version: 1.0.0
   # 未显式指定 --env/APP_ENV 时，用哪个 profile
   env: dev
@@ -44,9 +44,9 @@ database:
   #   该要求已写进 config.Validate，漏了会在启动时直接失败。
   #
   # PostgreSQL：键值对格式，形如
-  #   host=127.0.0.1 user=postgres password=123456 dbname=gin_quick_start port=5432 sslmode=disable TimeZone=Asia/Shanghai
+  #   host=127.0.0.1 user=postgres password=123456 dbname=golang_server_starter port=5432 sslmode=disable TimeZone=Asia/Shanghai
   #   本地/内网没有 TLS 时必须写 sslmode=disable，否则会尝试 SSL 连接而失败。
-  dsn: root:123456@tcp(127.0.0.1:3306)/gin_quick_start?charset=utf8mb4&parseTime=True&loc=Local
+  dsn: root:123456@tcp(127.0.0.1:3306)/golang_server_starter?charset=utf8mb4&parseTime=True&loc=Local
   max_idle_conns: 10
   max_open_conns: 100
   conn_max_lifetime: 1h
@@ -56,7 +56,7 @@ database:
 jwt:
   # 生产务必通过 APP_JWT_SECRET 覆盖，长度建议 >= 32
   secret: change-me-in-production-please-use-a-long-random-secret
-  issuer: gin-quick-start
+  issuer: golang-server-starter
   access_ttl: 2h
   refresh_ttl: 168h # 7 天
 
@@ -111,15 +111,3 @@ cors:
   expose_headers: [X-Request-Id]
   allow_credentials: false
   max_age: 12h
-
-# ── GraphQL 只读查询层 ────────────────────────────────────────────────────
-# 与 REST 并存：REST 接口一个都不少，GraphQL 只额外提供 Query（无 Mutation）。
-# schema 定义在 internal/graphql/schema.graphqls，改完跑 `make gqlgen` 重新生成代码。
-graphql:
-  enabled: true
-  path: /graphql # 端点路径，必须以 / 开头
-  # 浏览器调试 IDE：开启后 GET 同一路径即可打开 GraphiQL
-  playground: false
-  # 是否允许 introspection 查询（客户端据此拉取完整 schema）
-  # 两者默认关闭，由 config-dev.yaml 打开 —— 生产不该默认暴露 schema
-  introspection: false

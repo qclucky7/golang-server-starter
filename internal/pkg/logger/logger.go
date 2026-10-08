@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"strings"
 
-	"gin-quick-start/internal/config"
+	"golang-server-starter/internal/config"
 
 	"github.com/sirupsen/logrus"
 	"gopkg.in/natefinch/lumberjack.v2"

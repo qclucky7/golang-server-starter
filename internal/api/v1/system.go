@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"gin-quick-start/internal/config"
-	"gin-quick-start/internal/pkg/response"
+	"golang-server-starter/internal/config"
+	"golang-server-starter/internal/pkg/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,7 +28,7 @@ func (m *systemModule) Register(engine *gin.Engine) {
 // HealthCheckResponse 健康检查响应
 type HealthCheckResponse struct {
 	Available bool   `json:"available" example:"true"`
-	Name      string `json:"name" example:"gin-quick-start"`
+	Name      string `json:"name" example:"golang-server-starter"`
 	Version   string `json:"version" example:"1.0.0"`
 	Env       string `json:"env" example:"dev"`
 }

@@ -9,8 +9,8 @@ import (
 	"errors"
 	"sync"
 
-	"gin-quick-start/internal/model"
-	"gin-quick-start/internal/pkg/query"
+	"golang-server-starter/internal/model"
+	"golang-server-starter/internal/pkg/query"
 
 	"gorm.io/gorm"
 )

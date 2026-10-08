@@ -2,10 +2,10 @@
 package api
 
 import (
-	"gin-quick-start/internal/api/v1"
-	"gin-quick-start/internal/apperr"
-	"gin-quick-start/internal/middleware"
-	"gin-quick-start/internal/pkg/response"
+	"golang-server-starter/internal/api/v1"
+	"golang-server-starter/internal/apperr"
+	"golang-server-starter/internal/middleware"
+	"golang-server-starter/internal/pkg/response"
 
 	"github.com/gin-gonic/gin"
 )

@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"gin-quick-start/internal/apperr"
-	"gin-quick-start/internal/config"
+	"golang-server-starter/internal/apperr"
+	"golang-server-starter/internal/config"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"

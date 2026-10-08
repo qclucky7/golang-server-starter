@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"gin-quick-start/internal/model"
-	"gin-quick-start/internal/pkg/query"
-	"gin-quick-start/internal/repository"
+	"golang-server-starter/internal/model"
+	"golang-server-starter/internal/pkg/query"
+	"golang-server-starter/internal/repository"
 )
 
 // TestPageOrderByFallsBackOnUnknownColumn 客户端传不存在的排序列时，

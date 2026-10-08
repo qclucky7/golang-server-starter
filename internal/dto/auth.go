@@ -1,8 +1,8 @@
 package dto
 
 import (
-	"gin-quick-start/internal/pkg/query"
-	"gin-quick-start/internal/pkg/token"
+	"golang-server-starter/internal/pkg/query"
+	"golang-server-starter/internal/pkg/token"
 )
 
 // PageQuery 分页查询参数，内嵌 query.Page 以复用分页与排序逻辑

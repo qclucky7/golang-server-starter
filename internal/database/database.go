@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gin-quick-start/internal/config"
-	"gin-quick-start/internal/model"
+	"golang-server-starter/internal/config"
+	"golang-server-starter/internal/model"
 
 	"github.com/glebarez/sqlite"
 	"gorm.io/driver/mysql"
@@ -115,9 +115,9 @@ func logLevel(level string) gormlogger.LogLevel {
 func DefaultDSN(driver string) string {
 	switch strings.ToLower(driver) {
 	case "mysql":
-		return "root:123456@tcp(127.0.0.1:3306)/gin_quick_start?charset=utf8mb4&parseTime=True&loc=Local"
+		return "root:123456@tcp(127.0.0.1:3306)/golang_server_starter?charset=utf8mb4&parseTime=True&loc=Local"
 	case "postgres":
-		return "host=127.0.0.1 user=postgres password=123456 dbname=gin_quick_start port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+		return "host=127.0.0.1 user=postgres password=123456 dbname=golang_server_starter port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	default:
 		return "data/app.db"
 	}

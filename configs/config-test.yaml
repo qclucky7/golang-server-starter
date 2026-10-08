@@ -13,7 +13,7 @@ server:
 database:
   driver: mysql
   # 独立的库名，避免和开发库互相污染
-  dsn: root:123456@tcp(127.0.0.1:3306)/gin_quick_start_test?charset=utf8mb4&parseTime=True&loc=Local
+  dsn: root:123456@tcp(127.0.0.1:3306)/golang_server_starter_test?charset=utf8mb4&parseTime=True&loc=Local
   log_level: silent
   auto_migrate: true
 

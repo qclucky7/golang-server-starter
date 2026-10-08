@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"gin-quick-start/internal/apperr"
-	"gin-quick-start/internal/pkg/contextx"
-	"gin-quick-start/internal/pkg/response"
+	"golang-server-starter/internal/apperr"
+	"golang-server-starter/internal/pkg/contextx"
+	"golang-server-starter/internal/pkg/response"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"

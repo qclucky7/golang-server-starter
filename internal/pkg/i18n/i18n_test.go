@@ -3,7 +3,7 @@ package i18n_test
 import (
 	"testing"
 
-	"gin-quick-start/internal/pkg/i18n"
+	"golang-server-starter/internal/pkg/i18n"
 )
 
 func setup(t *testing.T) {

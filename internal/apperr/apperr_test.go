@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"gin-quick-start/internal/apperr"
-	"gin-quick-start/internal/pkg/i18n"
+	"golang-server-starter/internal/apperr"
+	"golang-server-starter/internal/pkg/i18n"
 )
 
 func setupI18N(t *testing.T) {

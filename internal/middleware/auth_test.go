@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"gin-quick-start/internal/apperr"
-	"gin-quick-start/internal/model"
-	"gin-quick-start/internal/pkg/token"
+	"golang-server-starter/internal/apperr"
+	"golang-server-starter/internal/model"
+	"golang-server-starter/internal/pkg/token"
 
 	"github.com/gin-gonic/gin"
 )

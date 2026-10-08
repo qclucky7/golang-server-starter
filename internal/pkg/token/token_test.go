@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"gin-quick-start/internal/pkg/token"
+	"golang-server-starter/internal/pkg/token"
 )
 
 func newManager(accessTTL, refreshTTL time.Duration) *token.Manager {

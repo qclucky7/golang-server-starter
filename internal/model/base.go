@@ -4,7 +4,7 @@ package model
 import (
 	"time"
 
-	"gin-quick-start/internal/pkg/snowflake"
+	"golang-server-starter/internal/pkg/snowflake"
 
 	"gorm.io/gorm"
 	"gorm.io/plugin/soft_delete"

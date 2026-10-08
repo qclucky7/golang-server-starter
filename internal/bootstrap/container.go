@@ -4,14 +4,14 @@ package bootstrap
 import (
 	"fmt"
 
-	"gin-quick-start/internal/api"
-	"gin-quick-start/internal/config"
-	"gin-quick-start/internal/database"
-	"gin-quick-start/internal/pkg/i18n"
-	"gin-quick-start/internal/pkg/logger"
-	"gin-quick-start/internal/pkg/request"
-	"gin-quick-start/internal/pkg/snowflake"
-	"gin-quick-start/internal/pkg/token"
+	"golang-server-starter/internal/api"
+	"golang-server-starter/internal/config"
+	"golang-server-starter/internal/database"
+	"golang-server-starter/internal/pkg/i18n"
+	"golang-server-starter/internal/pkg/logger"
+	"golang-server-starter/internal/pkg/request"
+	"golang-server-starter/internal/pkg/snowflake"
+	"golang-server-starter/internal/pkg/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"

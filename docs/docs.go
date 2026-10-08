@@ -608,7 +608,7 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string",
-                    "example": "gin-quick-start"
+                    "example": "golang-server-starter"
                 },
                 "version": {
                     "type": "string",
@@ -633,7 +633,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "Gin Quick Start API",
+	Title:            "Golang Server Starter API",
 	Description:      "基于 Gin + GORM 的 Go 服务端模板：统一响应体、统一错误处理、JWT 鉴权、泛型 CRUD 仓储、Swagger 文档。\n\n鉴权方式：请求头 `Authorization: Bearer <token>`，不兼容其他写法。\n主键为雪花算法生成的 19 位整数，JSON 中以字符串返回（避免 JS 精度丢失）。",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

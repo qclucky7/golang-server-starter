@@ -16,9 +16,9 @@
 package contextx
 
 import (
-	"gin-quick-start/internal/model"
-	"gin-quick-start/internal/pkg/i18n"
-	"gin-quick-start/internal/pkg/token"
+	"golang-server-starter/internal/model"
+	"golang-server-starter/internal/pkg/i18n"
+	"golang-server-starter/internal/pkg/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"

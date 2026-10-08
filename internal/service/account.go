@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 
-	"gin-quick-start/internal/apperr"
-	"gin-quick-start/internal/model"
-	"gin-quick-start/internal/pkg/hash"
-	"gin-quick-start/internal/repository"
+	"golang-server-starter/internal/apperr"
+	"golang-server-starter/internal/model"
+	"golang-server-starter/internal/pkg/hash"
+	"golang-server-starter/internal/repository"
 )
 
 // AccountService 账号自服务业务。

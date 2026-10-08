@@ -3,7 +3,7 @@ package hash_test
 import (
 	"testing"
 
-	"gin-quick-start/internal/pkg/hash"
+	"golang-server-starter/internal/pkg/hash"
 )
 
 func TestPasswordHashAndVerify(t *testing.T) {

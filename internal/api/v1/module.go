@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"gin-quick-start/internal/config"
-	"gin-quick-start/internal/pkg/token"
+	"golang-server-starter/internal/config"
+	"golang-server-starter/internal/pkg/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -33,13 +33,9 @@ type Module interface {
 // 新增业务域时只改这里：新建一个同包文件实现 Module，然后在下面加一行。
 // 既有模块的代码一行都不用动。
 func Modules(deps Dependencies) []Module {
-	modules := []Module{
+	return []Module{
 		newAccountModule(deps),
+		newOrgModule(deps),
 		newSystemModule(deps),
 	}
-	// GraphQL 查询层可以按配置整体关闭，关闭时一条路由都不挂
-	if deps.Config.GraphQL.Enabled {
-		modules = append(modules, newGraphQLModule(deps))
-	}
-	return modules
 }

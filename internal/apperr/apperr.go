@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"gin-quick-start/internal/pkg/i18n"
+	"golang-server-starter/internal/pkg/i18n"
 )
 
 // APIError 统一业务错误

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	v1 "gin-quick-start/internal/api/v1"
-	"gin-quick-start/internal/config"
+	v1 "golang-server-starter/internal/api/v1"
+	"golang-server-starter/internal/config"
 
 	"github.com/gin-gonic/gin"
 )
@@ -44,6 +44,7 @@ func TestNoAdminAccountRoutes(t *testing.T) {
 		"POST /api/v1/auth/logout",
 		"GET /api/v1/auth/profile",
 		"PUT /api/v1/auth/password",
+		"GET /api/v1/orgs",
 	}
 	for _, w := range want {
 		if !registered[w] {

@@ -162,7 +162,7 @@ definitions:
         example: dev
         type: string
       name:
-        example: gin-quick-start
+        example: golang-server-starter
         type: string
       version:
         example: 1.0.0
@@ -175,7 +175,7 @@ info:
 
     鉴权方式：请求头 `Authorization: Bearer <token>`，不兼容其他写法。
     主键为雪花算法生成的 19 位整数，JSON 中以字符串返回（避免 JS 精度丢失）。
-  title: Gin Quick Start API
+  title: Golang Server Starter API
   version: 1.0.0
 paths:
   /api/v1/auth/login:

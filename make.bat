@@ -1,10 +1,10 @@
 @echo off
-REM gin-quick-start Windows 命令包装，用法：make.bat <target> [env]
+REM golang-server-starter Windows 命令包装，用法：make.bat <target> [env]
 REM 可用 target 与 Makefile 保持一致：run / build / docs / fmt / vet / test / tidy / check / clean
 REM run 支持第二个参数指定环境，例如：make.bat run test
 
 setlocal
-set APP_NAME=gin-quick-start
+set APP_NAME=golang-server-starter
 set MAIN_PKG=./cmd/server
 set ENV=%~2
 if "%ENV%"=="" set ENV=dev
@@ -27,7 +27,7 @@ echo [ERROR] 未知命令: %~1
 goto help
 
 :help
-echo gin-quick-start 可用命令:
+echo golang-server-starter 可用命令:
 echo   make.bat run [env]  本地启动服务（env 默认 dev，如 make.bat run test）
 echo   make.bat build      编译到 bin/
 echo   make.bat build-linux    交叉编译 Linux amd64 到 bin/

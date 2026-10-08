@@ -3,9 +3,9 @@ package middleware
 import (
 	"strings"
 
-	"gin-quick-start/internal/config"
-	"gin-quick-start/internal/pkg/contextx"
-	"gin-quick-start/internal/pkg/i18n"
+	"golang-server-starter/internal/config"
+	"golang-server-starter/internal/pkg/contextx"
+	"golang-server-starter/internal/pkg/i18n"
 
 	"github.com/gin-gonic/gin"
 )

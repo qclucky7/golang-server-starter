@@ -7,13 +7,14 @@ import (
 	"testing"
 	"time"
 
-	"gin-quick-start/internal/apperr"
-	"gin-quick-start/internal/dto"
-	"gin-quick-start/internal/model"
-	"gin-quick-start/internal/pkg/snowflake"
-	"gin-quick-start/internal/pkg/token"
-	"gin-quick-start/internal/repository"
-	"gin-quick-start/internal/service"
+	"golang-server-starter/internal/apperr"
+	"golang-server-starter/internal/dto"
+	"golang-server-starter/internal/model"
+	"golang-server-starter/internal/pkg/query"
+	"golang-server-starter/internal/pkg/snowflake"
+	"golang-server-starter/internal/pkg/token"
+	"golang-server-starter/internal/repository"
+	"golang-server-starter/internal/service"
 
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
@@ -294,5 +295,67 @@ func TestDefaultOrgLookup(t *testing.T) {
 	}
 	if ghost != nil {
 		t.Fatalf("不存在的账号不应有默认组织: %+v", ghost)
+	}
+}
+
+// TestListOrgsByOwnerPagination 分页查询只返回当前账号自己的组织。
+//
+// 这是模板里唯一的分页接口，覆盖三件事：总条数正确、分页切片正确、
+// 不串到别人的组织（owner_id 过滤必须生效）。
+func TestListOrgsByOwnerPagination(t *testing.T) {
+	env := newTestEnv(t)
+	ctx := context.Background()
+	demo := registerDemo(t, env)
+	orgs := service.NewOrgService(env.orgRepo)
+
+	// 注册时已自动创建 1 个默认组织，这里再补 2 个
+	for _, name := range []string{"研发部", "市场部"} {
+		org := &model.Org{Name: name, OwnerID: demo.ID}
+		if err := env.orgRepo.Create(ctx, org); err != nil {
+			t.Fatalf("创建组织失败: %v", err)
+		}
+	}
+	// 另一个账号也会有自己的组织，它不应出现在 demo 的结果里
+	if _, err := env.auth.Register(ctx, &dto.RegisterRequest{
+		Username: "other", Email: "other@example.com", Password: "demo1234",
+	}); err != nil {
+		t.Fatalf("注册第二个账号失败: %v", err)
+	}
+
+	// 第一页：total 应为 3（若 owner_id 过滤失效则是 4）
+	page := query.Page{Current: 1, Size: 2}
+	items, total, err := orgs.ListByOwner(ctx, demo.ID, &page)
+	if err != nil {
+		t.Fatalf("查询组织列表失败: %v", err)
+	}
+	if total != 3 {
+		t.Fatalf("demo 的组织总数应为 3，实际 %d（owner_id 过滤可能失效）", total)
+	}
+	if len(items) != 2 {
+		t.Fatalf("size=2 应返回 2 条，实际 %d", len(items))
+	}
+	for _, item := range items {
+		if item.OwnerID != demo.ID {
+			t.Fatalf("不应返回他人组织: owner=%d", item.OwnerID)
+		}
+	}
+
+	// 第二页只剩 1 条
+	page2 := query.Page{Current: 2, Size: 2}
+	items2, total2, err := orgs.ListByOwner(ctx, demo.ID, &page2)
+	if err != nil {
+		t.Fatalf("查询第二页失败: %v", err)
+	}
+	if total2 != 3 || len(items2) != 1 {
+		t.Fatalf("第二页应为 1 条 / 共 3 条，实际 %d / %d", len(items2), total2)
+	}
+
+	// 越界参数应被归一化，并回写到入参，供调用方构造分页信息
+	page3 := query.Page{Current: 0, Size: 99999}
+	if _, _, err := orgs.ListByOwner(ctx, demo.ID, &page3); err != nil {
+		t.Fatalf("查询失败: %v", err)
+	}
+	if page3.Current != query.DefaultCurrent || page3.Size != query.MaxSize {
+		t.Fatalf("分页参数应被归一化，实际 %+v", page3)
 	}
 }

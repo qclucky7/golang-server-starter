@@ -4,7 +4,7 @@ package dto
 import (
 	"time"
 
-	"gin-quick-start/internal/model"
+	"golang-server-starter/internal/model"
 )
 
 // Account 账号信息响应

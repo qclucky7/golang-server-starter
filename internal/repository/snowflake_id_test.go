@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"gin-quick-start/internal/model"
-	"gin-quick-start/internal/repository"
+	"golang-server-starter/internal/model"
+	"golang-server-starter/internal/repository"
 )
 
 // TestSnowflakePrimaryKey 主键必须是应用层生成的雪花 ID，而不是数据库自增。

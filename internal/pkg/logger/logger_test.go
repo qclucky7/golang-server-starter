@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"gin-quick-start/internal/config"
+	"golang-server-starter/internal/config"
 
 	"github.com/sirupsen/logrus"
 )

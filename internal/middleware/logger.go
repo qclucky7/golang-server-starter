@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"gin-quick-start/internal/constant"
-	"gin-quick-start/internal/pkg/contextx"
+	"golang-server-starter/internal/constant"
+	"golang-server-starter/internal/pkg/contextx"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"

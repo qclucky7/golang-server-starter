@@ -1,8 +1,8 @@
 package dto
 
 import (
-	"gin-quick-start/internal/model"
-	"gin-quick-start/internal/pkg/query"
+	"golang-server-starter/internal/model"
+	"golang-server-starter/internal/pkg/query"
 )
 
 // NewPageResult 依据查询参数与总条数构造分页信息
