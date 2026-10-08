@@ -1,7 +1,0 @@
-{
-    "id.not.empty":"ID不能为空",
-    "too.many.requests":"请求过于频繁，请稍后再试",
-    "server.unknown.exception":"服务器未知异常",
-    "auth.token.expired":"登录已过期，请重新登录",
-    "no.access.permission":"无访问权限"
-}

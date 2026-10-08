@@ -1,7 +1,0 @@
-{
-    "id.not.empty":"ID cannot be empty",
-    "too.many.requests":"Too many requests, please try again later",
-    "server.unknown.exception":"Unknown server exception",
-    "auth.token.expired":"Login has expired, please login again",
-    "no.access.permission":"No access permission"
-}

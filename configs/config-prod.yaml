@@ -1,0 +1,35 @@
+# 生产环境（profile: prod）
+#
+# 只写与 configs/config.yaml 不同的项。**上线前必须确认下面三处**：
+#   1. jwt.secret        —— 通过 APP_JWT_SECRET 注入，不要写进文件
+#   2. database.dsn      —— 通过 APP_DATABASE_DSN 注入
+#   3. cors.allow_origins —— 改成真实前端域名，不要用 "*"
+#
+# app.node_id 在多实例部署时**必须**逐实例配置（APP_NODE_ID），
+# 否则不同实例会生成相同的雪花 ID。
+
+server:
+  mode: release
+
+database:
+  log_level: error
+  # 生产用 golang-migrate / goose 管理表结构变更，不靠 AutoMigrate
+  auto_migrate: false
+
+log:
+  level: info
+  console: false # 交给容器日志采集，不再重复输出到 stdout
+  log_header: true # 体积小，保留便于溯源
+  log_body: false # 会记录业务数据，含 PII 的接口不应长期开启
+
+rate_limit:
+  enabled: true
+  rps: 100
+  burst: 200
+
+cors:
+  # 生产不要用 "*"；留空数组表示不放开任何跨域来源
+  allow_origins:
+    - "https://app.example.com"
+  allow_credentials: true
+  max_age: 24h

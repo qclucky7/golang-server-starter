@@ -1,25 +1,24 @@
 package middleware
 
 import (
-	contextManager "gin-quick-start/internal/context"
+	"gin-quick-start/internal/constant"
+	"gin-quick-start/internal/pkg/contextx"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/gookit/goutil/strutil"
 )
 
-const (
-	REQUEST_ID_KEY = "X-Request-Id"
-)
-
-func RequestId() gin.HandlerFunc {
+// RequestID 为每个请求分配唯一 ID：
+//   - 优先沿用调用方传入的 X-Request-Id，便于全链路追踪
+//   - 写入上下文，并在响应头回写
+func RequestID() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		requestId := c.Request.Header.Get(REQUEST_ID_KEY)
-		if strutil.IsEmpty(requestId) {
-			requestId = uuid.New().String()
+		requestID := c.GetHeader(constant.HeaderRequestID)
+		if requestID == "" {
+			requestID = uuid.NewString()
 		}
-		contextManager.SetRequestId(c, requestId)
+		contextx.SetRequestID(c, requestID)
+		c.Writer.Header().Set(constant.HeaderRequestID, requestID)
 		c.Next()
-		c.Writer.Header().Set(REQUEST_ID_KEY, requestId)
 	}
 }

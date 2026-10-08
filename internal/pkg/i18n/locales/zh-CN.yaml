@@ -1,0 +1,58 @@
+# zh-CN 简体中文文案
+#
+# key 与 internal/apperr 的错误码一一对应，错误响应会自动按请求语言查表。
+# 值为 fmt 模板，%s 按顺序对应 APIError.Extra。
+# 新增错误码时，请同步在 zh-CN.yaml 与 en-US.yaml 中添加同名 key。
+
+# --- 通用 ---
+common.bad.request: "请求参数错误"
+common.validate.error: "参数校验失败: %s"
+common.not.found: "资源不存在"
+common.conflict: "资源已存在"
+common.forbidden: "无访问权限"
+common.rate.limit: "请求过于频繁，请稍后重试"
+common.internal.error: "服务内部异常"
+common.database.error: "数据库操作异常"
+common.route.not.found: "接口不存在"
+common.method.not.allowed: "请求方法不被允许"
+
+# --- 鉴权与账号 ---
+auth.token.missing: "缺少鉴权令牌，请在 %s 请求头中携带"
+auth.token.malformed: "鉴权令牌格式非法，期望 %s <token>"
+auth.token.invalid: "鉴权令牌无效"
+auth.token.expired: "鉴权令牌已过期"
+auth.token.revoked: "鉴权令牌已失效，请重新登录"
+auth.token.wrong.type: "令牌类型不正确"
+auth.account.not.found: "账号不存在或已注销"
+auth.account.disabled: "账号已被禁用"
+auth.password.wrong: "账号或密码错误"
+auth.old.password.wrong: "原密码错误"
+auth.token.sign.failed: "令牌签发失败"
+
+# --- 账号域 ---
+account.not.found: "账号不存在"
+account.username.exists: "用户名已被占用"
+account.email.exists: "邮箱已被注册"
+account.create.failed: "创建账号失败"
+account.update.failed: "更新账号失败"
+account.password.hash.failed: "密码加密失败"
+
+# --- 组织域 ---
+org.not.found: "组织不存在"
+org.create.failed: "创建组织失败"
+
+# --- 参数校验 ---
+validate.required: "%s 为必填项"
+validate.email: "%s 邮箱格式不正确"
+validate.username: "%s 需为 3-32 位字母、数字、下划线或短横线"
+validate.password: "%s 需为 8-64 位且同时包含字母和数字"
+validate.min: "%s 长度不能小于 %s"
+validate.max: "%s 长度不能大于 %s"
+validate.gte: "%s 不能小于 %s"
+validate.lte: "%s 不能大于 %s"
+validate.oneof: "%s 只能是 %s 之一"
+validate.url: "%s 需为合法 URL"
+validate.e164: "%s 需为合法国际手机号"
+validate.type.mismatch: "字段 %s 类型应为 %s"
+validate.json.syntax: "请求体不是合法的 JSON"
+validate.default: "%s 不满足校验规则 %s"

@@ -1,41 +1,398 @@
+basePath: /
 definitions:
-  models.Result-string:
+  dto.Account:
     properties:
-      data:
-        description: data
+      created_time:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      last_login_at:
+        type: string
+      last_login_ip:
+        type: string
+      nickname:
         type: string
       status:
-        description: status
+        type: integer
+      updated_time:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.AccountDetail:
+    properties:
+      account:
+        $ref: '#/definitions/dto.Account'
+      org:
+        $ref: '#/definitions/dto.Org'
+    type: object
+  dto.AuthResponse:
+    properties:
+      account:
+        $ref: '#/definitions/dto.Account'
+      token:
+        $ref: '#/definitions/token.Pair'
+    type: object
+  dto.ChangePasswordRequest:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        maxLength: 64
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  dto.LoginRequest:
+    properties:
+      account:
+        maxLength: 128
+        type: string
+      password:
+        maxLength: 64
+        type: string
+    required:
+    - account
+    - password
+    type: object
+  dto.Org:
+    properties:
+      created_time:
+        type: string
+      id:
+        type: integer
+      is_default:
+        type: boolean
+      name:
+        type: string
+      owner_id:
+        type: integer
+      updated_time:
+        type: string
+    type: object
+  dto.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  dto.RegisterRequest:
+    properties:
+      email:
+        maxLength: 128
+        type: string
+      nickname:
+        maxLength: 64
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  model.DataSetResult-model_SystemErrorItemResult:
+    properties:
+      datas:
+        description: 数据列表
+        items:
+          $ref: '#/definitions/model.SystemErrorItemResult'
+        type: array
+      model:
+        description: 固定为 data.set
+        type: string
+      total:
+        description: 数据总量
         type: integer
     type: object
-host: 127.0.0.1:9000
+  model.SystemErrorItemResult:
+    properties:
+      code:
+        description: 错误码
+        type: string
+      message:
+        description: 错误描述
+        type: string
+      model:
+        description: 固定为 error
+        type: string
+    type: object
+  model.SystemErrorResult:
+    properties:
+      errors:
+        $ref: '#/definitions/model.DataSetResult-model_SystemErrorItemResult'
+      model:
+        description: 固定为 errors
+        type: string
+      request_id:
+        type: string
+    type: object
+  response.Body:
+    properties:
+      data: {}
+      model:
+        type: string
+      request_id:
+        type: string
+    type: object
+  token.Pair:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        description: access_token 有效期（秒）
+        type: integer
+      refresh_token:
+        type: string
+      token_type:
+        type: string
+    type: object
+  v1.HealthCheckResponse:
+    properties:
+      available:
+        example: true
+        type: boolean
+      env:
+        example: dev
+        type: string
+      name:
+        example: gin-quick-start
+        type: string
+      version:
+        example: 1.0.0
+        type: string
+    type: object
 info:
   contact: {}
-  title: Web Server Documentation
+  description: |-
+    基于 Gin + GORM 的 Go 服务端模板：统一响应体、统一错误处理、JWT 鉴权、泛型 CRUD 仓储、Swagger 文档。
+
+    鉴权方式：请求头 `Authorization: Bearer <token>`，不兼容其他写法。
+    主键为雪花算法生成的 19 位整数，JSON 中以字符串返回（避免 JS 精度丢失）。
+  title: Gin Quick Start API
   version: 1.0.0
 paths:
-  /v1/hello-word:
-    get:
-      description: Hello World
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: account 支持用户名或邮箱；成功后返回 access_token / refresh_token
+      parameters:
+      - description: 登录参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
       responses:
         "200":
-          description: success
+          description: 登录成功
           schema:
-            $ref: '#/definitions/models.Result-string'
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AuthResponse'
+              type: object
+        "400":
+          description: 参数校验失败
+          schema:
+            $ref: '#/definitions/model.SystemErrorResult'
+        "401":
+          description: 账号或密码错误
+          schema:
+            $ref: '#/definitions/model.SystemErrorResult'
         "403":
-          description: System error
+          description: 账号已被禁用
           schema:
-            $ref: '#/definitions/models.Result-string'
-        "500":
-          description: System error
-          schema:
-            $ref: '#/definitions/models.Result-string'
-      summary: Hello World
+            $ref: '#/definitions/model.SystemErrorResult'
+      summary: 账号登录
       tags:
-      - API
-schemes:
-- http
+      - Auth
+  /api/v1/auth/logout:
+    post:
+      description: 递增令牌版本，吊销该账号已签发的全部令牌（含其他设备）
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 退出成功
+          schema:
+            $ref: '#/definitions/response.Body'
+        "401":
+          description: 未登录或令牌失效
+          schema:
+            $ref: '#/definitions/model.SystemErrorResult'
+      security:
+      - Authorization: []
+      summary: 退出登录
+      tags:
+      - Auth
+  /api/v1/auth/password:
+    put:
+      consumes:
+      - application/json
+      description: 校验原密码后更新密码，并吊销该账号全部已签发令牌（需重新登录）
+      parameters:
+      - description: 密码参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 修改成功
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: 原密码错误或新密码不符合要求
+          schema:
+            $ref: '#/definitions/model.SystemErrorResult'
+        "401":
+          description: 未登录或令牌失效
+          schema:
+            $ref: '#/definitions/model.SystemErrorResult'
+      security:
+      - Authorization: []
+      summary: 修改密码
+      tags:
+      - Auth
+  /api/v1/auth/profile:
+    get:
+      description: 返回当前登录账号及其默认组织。账号由令牌解析得到，不接受目标账号 ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AccountDetail'
+              type: object
+        "401":
+          description: 未登录或令牌失效
+          schema:
+            $ref: '#/definitions/model.SystemErrorResult'
+      security:
+      - Authorization: []
+      summary: 当前账号信息
+      tags:
+      - Auth
+  /api/v1/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: 使用 refresh_token 换取新的令牌对
+      parameters:
+      - description: 刷新参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 刷新成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AuthResponse'
+              type: object
+        "401":
+          description: 刷新令牌无效或已失效
+          schema:
+            $ref: '#/definitions/model.SystemErrorResult'
+      summary: 刷新令牌
+      tags:
+      - Auth
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: 创建新账号，用户名与邮箱全局唯一；注册成功同时初始化该账号的默认组织（不自动登录）
+      parameters:
+      - description: 注册参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 注册成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.Account'
+              type: object
+        "400":
+          description: 参数校验失败
+          schema:
+            $ref: '#/definitions/model.SystemErrorResult'
+        "409":
+          description: 用户名或邮箱已占用
+          schema:
+            $ref: '#/definitions/model.SystemErrorResult'
+      summary: 账号注册
+      tags:
+      - Auth
+  /api/v1/system/health-check:
+    get:
+      description: 检测服务是否可用，并返回应用基础信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 服务可用
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.HealthCheckResponse'
+              type: object
+      summary: 健康检查
+      tags:
+      - System
+  /healthz:
+    get:
+      description: 仅用于容器编排探测，不返回业务信息
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: 存活探针
+      tags:
+      - System
+securityDefinitions:
+  Authorization:
+    description: 标准鉴权头，格式：Bearer <access_token>
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
-tags:
-- description: Web API
-  name: API

@@ -1,0 +1,125 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# 基线配置：所有环境共享
+#
+# 多环境加载顺序（后者覆盖前者，深合并 —— 环境文件只写差异项即可）：
+#   1. configs/config.yaml          本文件，基线
+#   2. configs/config-{env}.yaml    环境专属，env 由 --env / -e / APP_ENV 决定
+#   3. APP_* 环境变量                最高优先级，用于 CI/CD 与容器注入
+#
+# 环境名的确定顺序：
+#   启动参数 --env/-e  >  APP_ENV  >  本文件的 app.env  >  兜底 dev
+#
+# 例：
+#   ./app -e prod                     # 加载 configs/config.yaml + configs/config-prod.yaml
+#   APP_ENV=test ./app                # 加载 configs/config.yaml + configs/config-test.yaml
+#   APP_SERVER_PORT=9090 ./app        # 覆盖 server.port（与 profile 无关）
+# ─────────────────────────────────────────────────────────────────────────────
+
+app:
+  name: gin-quick-start
+  version: 1.0.0
+  # 未显式指定 --env/APP_ENV 时，用哪个 profile
+  env: dev
+  # 雪花算法工作节点 ID（0-1023）。
+  # 单机单实例留 -1 即可：按主机名哈希推导，同一台机器重启不换号。
+  # k8s 多 Pod / 多机部署**必须**显式配置且互不相同，否则不同实例会生成相同的 ID。
+  node_id: -1
+
+server:
+  host: 0.0.0.0
+  port: 8080
+  mode: debug # debug / release / test
+  read_timeout: 15s
+  write_timeout: 15s
+  idle_timeout: 60s
+  shutdown_timeout: 10s
+
+database:
+  # mysql / postgres / sqlite
+  driver: mysql
+  # MySQL / PostgreSQL 用标准 DSN；sqlite 用文件路径（如 data/app.db）
+  #
+  # MySQL：注意 parseTime=True。缺少它，DATETIME 无法扫描进 time.Time，
+  #   会在第一条查询上报 "unsupported Scan ... into *time.Time"。
+  #   该要求已写进 config.Validate，漏了会在启动时直接失败。
+  #
+  # PostgreSQL：键值对格式，形如
+  #   host=127.0.0.1 user=postgres password=123456 dbname=gin_quick_start port=5432 sslmode=disable TimeZone=Asia/Shanghai
+  #   本地/内网没有 TLS 时必须写 sslmode=disable，否则会尝试 SSL 连接而失败。
+  dsn: root:123456@tcp(127.0.0.1:3306)/gin_quick_start?charset=utf8mb4&parseTime=True&loc=Local
+  max_idle_conns: 10
+  max_open_conns: 100
+  conn_max_lifetime: 1h
+  log_level: warn # silent / error / warn / info
+  auto_migrate: true # 启动时自动建表（生产建议关闭，改用迁移工具）
+
+jwt:
+  # 生产务必通过 APP_JWT_SECRET 覆盖，长度建议 >= 32
+  secret: change-me-in-production-please-use-a-long-random-secret
+  issuer: gin-quick-start
+  access_ttl: 2h
+  refresh_ttl: 168h # 7 天
+
+# 鉴权固定使用标准 Authorization 请求头，格式 Authorization: Bearer <token>，
+# 不接受自定义头名、裸令牌或查询参数传令牌，因此没有可配置项。
+
+i18n:
+  enabled: true
+  # 语言协商失败时的兜底语言
+  fallback: zh-CN
+  # 支持的语言，留空则自动使用 internal/pkg/i18n/locales 下发现的全部语言
+  support: [zh-CN, en-US]
+  # 标准语言协商请求头
+  header: Accept-Language
+  # 优先级更高的自定义请求头，前端可显式指定
+  alt_header: X-Lang
+  # 通过查询参数指定语言，留空表示不启用
+  query: lang
+
+log:
+  level: info # debug / info / warn / error
+  dir: logs
+  filename: app.log
+  error_file: error.log
+  max_size_mb: 32
+  max_backups: 7
+  max_age_days: 30
+  compress: true
+  console: true # 是否同时输出到控制台
+
+  # ── 访问日志的详细程度 ──────────────────────────────────────────────
+  # 开启后会额外打印请求头/响应头/请求体/响应体，便于排障。
+  # 生产建议：log_header 可按需长期开启（体积小），log_body 建议关闭（体积与开销大）。
+  log_header: false
+  log_body: false
+  body_limit: 4096 # 请求/响应体日志的截断长度（字节）
+  # 在内置脱敏名单之外追加需要打码的字段名/请求头名（大小写不敏感，忽略 - 与 _ 差异）
+  # 内置名单已覆盖 password / token / Authorization / Cookie / Set-Cookie 等
+  sensitive_keys: []
+
+rate_limit:
+  enabled: true
+  rps: 50 # 单 IP 每秒请求数
+  burst: 100 # 瞬时突发上限
+
+cors:
+  enabled: true
+  allow_origins:
+    - "*"
+  allow_methods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
+  allow_headers: [Origin, Content-Type, Accept, Authorization, X-Request-Id]
+  expose_headers: [X-Request-Id]
+  allow_credentials: false
+  max_age: 12h
+
+# ── GraphQL 只读查询层 ────────────────────────────────────────────────────
+# 与 REST 并存：REST 接口一个都不少，GraphQL 只额外提供 Query（无 Mutation）。
+# schema 定义在 internal/graphql/schema.graphqls，改完跑 `make gqlgen` 重新生成代码。
+graphql:
+  enabled: true
+  path: /graphql # 端点路径，必须以 / 开头
+  # 浏览器调试 IDE：开启后 GET 同一路径即可打开 GraphiQL
+  playground: false
+  # 是否允许 introspection 查询（客户端据此拉取完整 schema）
+  # 两者默认关闭，由 config-dev.yaml 打开 —— 生产不该默认暴露 schema
+  introspection: false

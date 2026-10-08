@@ -1,0 +1,59 @@
+# en-US English messages
+#
+# Keys mirror the error codes in internal/apperr, so error responses are
+# localized automatically based on the request language.
+# Values are fmt templates; %s maps to APIError.Extra in order.
+# Keep the key set identical to zh-CN.yaml.
+
+# --- Common ---
+common.bad.request: "Invalid request parameters"
+common.validate.error: "Parameter validation failed: %s"
+common.not.found: "Resource not found"
+common.conflict: "Resource already exists"
+common.forbidden: "Access denied"
+common.rate.limit: "Too many requests, please try again later"
+common.internal.error: "Internal server error"
+common.database.error: "Database operation failed"
+common.route.not.found: "Endpoint not found"
+common.method.not.allowed: "HTTP method not allowed"
+
+# --- Auth & account ---
+auth.token.missing: "Missing credentials, please provide a token in the %s header"
+auth.token.malformed: "Malformed token, expected %s <token>"
+auth.token.invalid: "Invalid token"
+auth.token.expired: "Token has expired"
+auth.token.revoked: "Token has been revoked, please sign in again"
+auth.token.wrong.type: "Wrong token type"
+auth.account.not.found: "Account does not exist or has been deactivated"
+auth.account.disabled: "Account has been disabled"
+auth.password.wrong: "Incorrect account or password"
+auth.old.password.wrong: "Current password is incorrect"
+auth.token.sign.failed: "Failed to sign token"
+
+# --- Account ---
+account.not.found: "Account not found"
+account.username.exists: "Username is already taken"
+account.email.exists: "Email is already registered"
+account.create.failed: "Failed to create account"
+account.update.failed: "Failed to update account"
+account.password.hash.failed: "Failed to hash password"
+
+# --- Org ---
+org.not.found: "Organization not found"
+org.create.failed: "Failed to create organization"
+
+# --- Validation ---
+validate.required: "%s is required"
+validate.email: "%s must be a valid email address"
+validate.username: "%s must be 3-32 characters of letters, digits, underscore or hyphen"
+validate.password: "%s must be 8-64 characters and contain both letters and digits"
+validate.min: "%s must be at least %s characters"
+validate.max: "%s must be at most %s characters"
+validate.gte: "%s must be greater than or equal to %s"
+validate.lte: "%s must be less than or equal to %s"
+validate.oneof: "%s must be one of %s"
+validate.url: "%s must be a valid URL"
+validate.e164: "%s must be a valid international phone number"
+validate.type.mismatch: "Field %s must be of type %s"
+validate.json.syntax: "Request body is not valid JSON"
+validate.default: "%s does not satisfy the %s rule"

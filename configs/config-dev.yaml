@@ -1,0 +1,39 @@
+# 开发环境（profile: dev）
+#
+# 只写与 configs/config.yaml 不同的项，其余全部继承基线。
+# 基线（test / prod 同款）是 MySQL，但**本地开发直接跑 sqlite** —— 零依赖，不用起数据库服务。
+# 需要连真实数据库时把下面 database 段换成注释里的 mysql / postgres。
+
+server:
+  mode: debug
+
+database:
+  # 本地开发零依赖：sqlite 文件库（纯 Go 实现，无需 CGO）
+  driver: sqlite
+  dsn: data/app.db
+  log_level: info
+
+  # ── 想连真实数据库时换成下面之一 ────────────────────────────────────
+  # MySQL（同基线）
+  # driver: mysql
+  # dsn: root:123456@tcp(127.0.0.1:3306)/gin_quick_start?charset=utf8mb4&parseTime=True&loc=Local
+  #
+  # PostgreSQL
+  # driver: postgres
+  # dsn: host=127.0.0.1 user=postgres password=123456 dbname=gin_quick_start port=5432 sslmode=disable TimeZone=Asia/Shanghai
+
+log:
+  level: debug
+  console: true
+  # 开发环境默认打开完整报文日志，方便排障
+  log_header: true
+  log_body: true
+
+rate_limit:
+  # 本地调试不限制
+  enabled: false
+
+graphql:
+  # 开发环境打开调试 IDE（浏览器访问 GET /graphql）与 introspection
+  playground: true
+  introspection: true

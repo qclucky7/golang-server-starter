@@ -1,0 +1,32 @@
+# 测试环境（profile: test）
+#
+# 与正式环境同构：都用 MySQL，避免「测试过、上线挂」。
+# 本地没有 MySQL 时把下面 database 段换成注释里的 sqlite 降级方案。
+#
+# 单元测试不受本文件影响 —— internal/*/*_test.go 直接用内存 sqlite，
+# 不依赖任何外部服务。
+
+server:
+  mode: test
+  port: 18080
+
+database:
+  driver: mysql
+  # 独立的库名，避免和开发库互相污染
+  dsn: root:123456@tcp(127.0.0.1:3306)/gin_quick_start_test?charset=utf8mb4&parseTime=True&loc=Local
+  log_level: silent
+  auto_migrate: true
+
+  # ── 本地没有 MySQL 时的降级方案 ──────────────────────────────────────
+  # driver: sqlite
+  # dsn: data/test.db
+
+log:
+  level: warn
+  console: true
+  log_header: false
+  log_body: false
+
+rate_limit:
+  # 测试里会连发请求，关掉避免误伤
+  enabled: false
